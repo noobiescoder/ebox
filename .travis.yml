@@ -18,10 +18,11 @@ before_script:
   - mkdir build && cd build
   - cmake .. && make
   - sudo make install
-  - cd ../..
+  - cd ../.. && ls
   - cargo install cargo-kcov
 
 script:
+  - cargo build
   - cargo kcov
 
 after_script:
