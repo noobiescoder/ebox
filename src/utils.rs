@@ -43,7 +43,8 @@ pub fn dir_read(target: &str) -> Result<Vec<String>, Error> {
             .to_string();
         res.push(p);
     }
-    Ok(res)
+
+    return Ok(res);
 }
 
 // read a file.
