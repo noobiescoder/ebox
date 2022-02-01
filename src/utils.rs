@@ -41,10 +41,11 @@ pub fn dir_read(target: &str) -> Result<Vec<String>, Error> {
             .to_str()
             .unwrap()
             .to_string();
-        res.push(p);
+
+        res.push(p)
     }
 
-    return Ok(res);
+    Ok(res)
 }
 
 // read a file.
