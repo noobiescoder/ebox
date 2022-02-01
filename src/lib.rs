@@ -14,4 +14,5 @@
 // limitations under the License.
 
 pub mod compiler;
+pub mod templates;
 pub mod utils;

@@ -31,18 +31,12 @@ pub fn file_exist(target: &str) -> bool {
 pub fn dir_read(target: &str) -> Result<Vec<String>, Error> {
     let path = PathBuf::from(target);
     let contents = fs::read_dir(path)?;
-    let mut res: Vec<String> = Vec::new();
-    for entry in contents {
-        let entry = entry?;
-        let p = entry
-            .path()
-            .file_name()
-            .unwrap()
-            .to_str()
-            .unwrap()
-            .to_string();
 
-        res.push(p)
+    let mut res: Vec<String> = Vec::new();
+
+    for ele in contents {
+        let el = ele.unwrap().file_name().into_string().unwrap();
+        res.push(el);
     }
 
     Ok(res)

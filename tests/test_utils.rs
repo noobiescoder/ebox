@@ -43,7 +43,7 @@ mod test_utils {
         // case 2
         let read_2 = utils::dir_read(".");
         assert_eq!(read_2.is_ok(), true);
-        assert!(read_2.unwrap().len() > 2);
+        assert_eq!(read_2.unwrap().contains(&"src".to_string()), true);
     }
 
     #[test]
