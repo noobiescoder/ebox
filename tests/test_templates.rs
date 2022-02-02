@@ -20,16 +20,16 @@ mod test_templates {
     #[test]
     fn test_config_new() {
         // case 1
+        let name = String::from("test_project");
+        let license = String::from("MIT");
+        let library: Vec<String> = Vec::new();
         let conf = Config {
-            project: Project {
-                name: "test_project".into(),
-                license: "MIT".into(),
-            },
+            project: Project { name, license },
             compiler: Compiler {
                 optimize: true,
                 runs: 200,
             },
-            library: [].into(),
+            library,
         };
 
         let json = config_new(&conf);

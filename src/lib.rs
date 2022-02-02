@@ -13,6 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+pub mod actions;
 pub mod compiler;
 pub mod templates;
 pub mod utils;
