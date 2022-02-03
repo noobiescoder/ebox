@@ -13,8 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::errors::{self, ResultExt};
 use serde::{Deserialize, Serialize};
-use serde_json::{self, Error};
+use serde_json;
+
 // Config structure for ebox.
 #[derive(Serialize, Deserialize)]
 pub struct Config {
@@ -38,13 +40,13 @@ pub struct Compiler {
 }
 
 // create config json.
-pub fn config_new(conf: &Config) -> Result<String, Error> {
-    serde_json::to_string_pretty(conf)
+pub fn config_new(conf: &Config) -> errors::Result<String> {
+    serde_json::to_string_pretty(conf).chain_err(|| "error parsing config into jso")
 }
 
 // decode config json.
-pub fn config_decode(conf: &str) -> Result<Config, Error> {
-    serde_json::from_str(conf)
+pub fn config_decode(conf: &str) -> errors::Result<Config> {
+    serde_json::from_str(conf).chain_err(|| "error decoding config")
 }
 
 // solidity templates.

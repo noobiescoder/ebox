@@ -13,11 +13,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#[macro_use]
-extern crate error_chain;
+error_chain! {
+    // error types
+    types {
+        Error, ErrorKind, ResultExt, Result;
+    }
 
-pub mod actions;
-pub mod compiler;
-pub mod errors;
-pub mod templates;
-pub mod utils;
+    // additionals error kind.
+    errors {
+        Interrupted(t: String) {
+            description("Error when executing command")
+            display("Error -> {}", t)
+        }
+    }
+}

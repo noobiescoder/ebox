@@ -13,34 +13,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::{
-    fs,
-    io::{Error, ErrorKind},
-    path::PathBuf,
-};
+use std::{fs, path::PathBuf};
 
 use crate::{
     compiler,
+    errors::{self, ResultExt},
     templates::{config_decode, config_new, solidity_new, Compiler, Config, Project},
     utils,
 };
 
 // actions for initiating new ebox project.
-pub fn init(path: &str, license: &str) -> Result<(), Error> {
+pub fn init(path: &str, license: &str) -> errors::Result<()> {
     let config_path = format!("{}/{}", path, "ebox.json");
     let dir_exist = utils::dir_exist(path);
     let config_exist = utils::file_exist(&config_path);
-    let err_1 = Error::new(ErrorKind::Interrupted, "Directory not empty");
 
     if !dir_exist {
         let _ = utils::dir_new(path)?;
     }
 
     if config_exist {
-        return Err(err_1);
+        return Err("folder already initiated".into());
     }
 
-    let name = fs::canonicalize(PathBuf::from(path))?
+    let name = fs::canonicalize(PathBuf::from(path))
+        .chain_err(|| "failed getting absolute path")?
         .file_name()
         .unwrap()
         .to_str()
@@ -65,18 +62,14 @@ pub fn init(path: &str, license: &str) -> Result<(), Error> {
 }
 
 // actions for create new contracts.
-pub fn new_contracts(contracts: Vec<String>) -> Result<(), Error> {
+pub fn new_contracts(contracts: &Vec<String>) -> errors::Result<()> {
     let config_path = "ebox.json";
     let config_exist = utils::file_exist(config_path);
     let contract_dir = "contracts";
     let contract_dir_exist = utils::dir_exist(contract_dir);
-    let err_1 = Error::new(
-        ErrorKind::Interrupted,
-        "`ebox.json` not found, consider init the project first.",
-    );
 
     if !config_exist {
-        return Err(err_1);
+        return Err("ebox.json not found, consider init this project first".into());
     }
 
     if !contract_dir_exist {
@@ -97,27 +90,18 @@ pub fn new_contracts(contracts: Vec<String>) -> Result<(), Error> {
 }
 
 // actions for compile the project.
-pub fn sbox() -> Result<(), Error> {
+pub fn sbox() -> errors::Result<()> {
     let config_path = "ebox.json";
     let config_exist = utils::file_exist(config_path);
     let contract_dir = "contracts";
     let contract_dir_exist = utils::dir_exist(contract_dir);
-    let err_1 = Error::new(
-        ErrorKind::Interrupted,
-        "`ebox.json` not found, consider init the project first.",
-    );
-
-    let err_2 = Error::new(
-        ErrorKind::Interrupted,
-        "`contracts` directory not found, consider create new contract inside `contracts` first.",
-    );
 
     if !config_exist {
-        return Err(err_1);
+        return Err("ebox.json not found, consider init this project first".into());
     }
 
     if !contract_dir_exist {
-        return Err(err_2);
+        return Err("contracts directory not found".into());
     }
 
     let conf_str = utils::file_read(config_path)?;

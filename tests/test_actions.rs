@@ -41,12 +41,12 @@ mod test_actions {
     #[serial]
     fn test_new_contracts() {
         // case 1
-        let new_1 = actions::new_contracts(vec!["Test".into(), "Debug".into()]);
+        let new_1 = actions::new_contracts(&vec!["Test".into(), "Debug".into()]);
         assert_ne!(new_1.is_ok(), true);
         // case 2
         let init_2 = actions::init(".", "MIT");
         assert_eq!(init_2.is_ok(), true);
-        let new_2 = actions::new_contracts(vec!["Test".into(), "Debug".into()]);
+        let new_2 = actions::new_contracts(&vec!["Test".into(), "Debug".into()]);
         assert_eq!(new_2.is_ok(), true);
         let c_dir = utils::dir_read("contracts");
         assert_eq!(c_dir.is_ok(), true);
@@ -70,7 +70,7 @@ mod test_actions {
         let sbox_2 = actions::sbox();
         assert_ne!(sbox_2.is_ok(), true);
         // case 3
-        let new_3 = actions::new_contracts(vec!["Test".into(), "Debug".into()]);
+        let new_3 = actions::new_contracts(&vec!["Test".into(), "Debug".into()]);
         println!("{:?}", new_3);
         assert_eq!(new_3.is_ok(), true);
         let sbox_3 = actions::sbox();

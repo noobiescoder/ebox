@@ -13,7 +13,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::{fs, io::Error, path::PathBuf};
+use crate::errors::{self, ResultExt};
+use std::{fs, path::PathBuf};
 
 // check if a dir exist.
 pub fn dir_exist(target: &str) -> bool {
@@ -28,9 +29,9 @@ pub fn file_exist(target: &str) -> bool {
 }
 
 // read all entry inside a dir.
-pub fn dir_read(target: &str) -> Result<Vec<String>, Error> {
+pub fn dir_read(target: &str) -> errors::Result<Vec<String>> {
     let path = PathBuf::from(target);
-    let contents = fs::read_dir(path)?;
+    let contents = fs::read_dir(path).chain_err(|| "failed reading directory contents")?;
 
     let mut res: Vec<String> = Vec::new();
 
@@ -43,31 +44,31 @@ pub fn dir_read(target: &str) -> Result<Vec<String>, Error> {
 }
 
 // read a file.
-pub fn file_read(target: &str) -> Result<String, Error> {
+pub fn file_read(target: &str) -> errors::Result<String> {
     let path = PathBuf::from(target);
-    fs::read_to_string(path)
+    fs::read_to_string(path).chain_err(|| "failed reading file")
 }
 
 // create a dir.
-pub fn dir_new(target: &str) -> Result<(), Error> {
+pub fn dir_new(target: &str) -> errors::Result<()> {
     let path = PathBuf::from(target);
-    fs::create_dir_all(path)
+    fs::create_dir_all(path).chain_err(|| "failed creating directory")
 }
 
 // write a file.
-pub fn file_new(target: &str, contents: &str) -> Result<(), Error> {
+pub fn file_new(target: &str, contents: &str) -> errors::Result<()> {
     let path = PathBuf::from(target);
-    fs::write(path, contents)
+    fs::write(path, contents).chain_err(|| "failed writing new file")
 }
 
 // delete directory.
-pub fn dir_del(target: &str) -> Result<(), Error> {
+pub fn dir_del(target: &str) -> errors::Result<()> {
     let path = PathBuf::from(target);
-    fs::remove_dir_all(path)
+    fs::remove_dir_all(path).chain_err(|| "failed deleting directory")
 }
 
 // delete files,
-pub fn file_del(target: &str) -> Result<(), Error> {
+pub fn file_del(target: &str) -> errors::Result<()> {
     let path = PathBuf::from(target);
-    fs::remove_file(path)
+    fs::remove_file(path).chain_err(|| "failed deleting file")
 }

@@ -13,10 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::{
-    io::{Error, ErrorKind},
-    process::Command,
-};
+use std::process::Command;
+
+use crate::errors::{self, ResultExt};
 
 // compiler objects.
 pub struct Compiler {
@@ -26,8 +25,11 @@ pub struct Compiler {
 // Compiler methods.
 impl Compiler {
     // get compiler version.
-    pub fn version(&self) -> Result<String, Error> {
-        let cmd = Command::new(self.bin.as_str()).arg("--version").output()?;
+    pub fn version(&self) -> errors::Result<String> {
+        let cmd = Command::new(self.bin.as_str())
+            .arg("--version")
+            .output()
+            .chain_err(|| "failed getting compiler version")?;
 
         unsafe {
             let res = std::str::from_utf8_unchecked(&cmd.stdout);
@@ -36,7 +38,7 @@ impl Compiler {
     }
 
     // compile solidity files.
-    pub fn compile(&self, input: &str, output_dir: &str, opts: &[String]) -> Result<(), Error> {
+    pub fn compile(&self, input: &str, output_dir: &str, opts: &[String]) -> errors::Result<()> {
         let cmd = Command::new(self.bin.as_str())
             .args(vec![
                 "--bin",
@@ -52,14 +54,11 @@ impl Compiler {
             .output();
 
         match cmd {
-            Err(err) => Err(err),
+            Err(err) => Err("failed running command to compile the contracts".into()),
             Ok(res) => {
                 if res.stderr.len() > 1 {
-                    unsafe {
-                        let err_str = std::str::from_utf8_unchecked(&res.stderr);
-                        let err = Error::new(ErrorKind::Interrupted, err_str);
-                        return Err(err);
-                    }
+                    println!("{}", std::str::from_utf8(&res.stderr).unwrap());
+                    return Err("error when compiling contracts".into());
                 }
 
                 Ok(())
