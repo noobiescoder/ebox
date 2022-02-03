@@ -1,0 +1,31 @@
+language: rust
+sudo: true
+
+addons:
+  apt:
+    packages:
+      - binutils-dev
+      - libcurl4-openssl-dev
+      - zlib1g-dev
+      - libdw-dev
+      - libiberty-dev
+
+before_script:
+  - sudo add-apt-repository -y ppa:ethereum/ethereum
+  - sudo apt-get -y update
+  - sudo apt-get -y install solc
+  - wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz && tar xzf master.tar.gz && cd kcov-master
+  - mkdir build && cd build
+  - cmake .. && make
+  - sudo make install
+  - cd ../.. && rm -rf kcov-master
+  - cargo install cargo-kcov
+
+script:
+  - cargo build
+  - cargo kcov
+
+after_script:
+  - bash <(curl -s https://codecov.io/bash)
+
+cache: cargo
