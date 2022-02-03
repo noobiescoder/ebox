@@ -48,6 +48,12 @@ enum Commands {
 
     /// compile solidity contracts.
     r#Box {},
+
+    /// create new deployment configuration.
+    Dep {
+        /// name of the contract for deployment.
+        contract: String,
+    },
 }
 
 fn main() {
@@ -76,6 +82,14 @@ fn main() {
             let sbox = actions::sbox();
             if sbox.is_err() {
                 println!("{:?}", sbox.err().unwrap());
+                process::exit(1);
+            }
+        }
+
+        Some(Commands::Dep { contract }) => {
+            let dep = actions::dep_new(&contract);
+            if dep.is_err() {
+                println!("{:?}", dep.err().unwrap());
                 process::exit(1);
             }
         }

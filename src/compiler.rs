@@ -54,7 +54,7 @@ impl Compiler {
             .output();
 
         match cmd {
-            Err(err) => Err("failed running command to compile the contracts".into()),
+            Err(_err) => Err("failed running command to compile the contracts".into()),
             Ok(res) => {
                 if res.stderr.len() > 1 {
                     println!("{}", std::str::from_utf8(&res.stderr).unwrap());

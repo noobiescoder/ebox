@@ -16,6 +16,7 @@
 use crate::errors::{self, ResultExt};
 use serde::{Deserialize, Serialize};
 use serde_json;
+use std::collections::HashMap;
 
 // Config structure for ebox.
 #[derive(Serialize, Deserialize)]
@@ -62,4 +63,58 @@ contract {} {{
         license, name
     )
     .to_string()
+}
+
+// deployment structure.
+#[derive(Serialize, Deserialize)]
+pub struct Deployment {
+    pub contract: String,
+    pub constructor: HashMap<String, Input>,
+}
+
+// deployment.inputs struct.
+#[derive(Serialize, Deserialize)]
+pub struct Input {
+    pub r#type: String,
+    pub value: String,
+}
+
+// ABI structure.
+#[derive(Deserialize)]
+pub struct Abis {
+    pub inputs: Vec<AbisInput>,
+}
+
+// ABI input structure.
+#[derive(Deserialize)]
+pub struct AbisInput {
+    pub name: String,
+    pub r#type: String,
+}
+
+// generate template from ABI.
+pub fn d_generate(contract: &str, abi: &str) -> errors::Result<String> {
+    let decode: Vec<Abis> = serde_json::from_str(abi).chain_err(|| "failed decoding ABI")?;
+
+    let mut constructor: HashMap<String, Input> = HashMap::new();
+
+    for input in &decode[0].inputs {
+        let inp = Input {
+            r#type: input.r#type.to_string(),
+            value: String::new(),
+        };
+        constructor.insert(input.name.to_string(), inp);
+    }
+
+    let dep = Deployment {
+        contract: contract.into(),
+        constructor,
+    };
+
+    serde_json::to_string_pretty(&dep).chain_err(|| "failed parsing deployment details.")
+}
+
+// decode deployment config.
+pub fn d_decode(contents: &str) -> errors::Result<Deployment> {
+    serde_json::from_str(contents).chain_err(|| "failed decode deployment config")
 }

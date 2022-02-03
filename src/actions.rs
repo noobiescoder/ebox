@@ -18,8 +18,8 @@ use std::{fs, path::PathBuf};
 use crate::{
     compiler,
     errors::{self, ResultExt},
-    templates::{config_decode, config_new, solidity_new, Compiler, Config, Project},
-    utils,
+    templates::{config_decode, config_new, d_generate, solidity_new, Compiler, Config, Project},
+    utils::{self, dir_exist},
 };
 
 // actions for initiating new ebox project.
@@ -130,4 +130,38 @@ pub fn sbox() -> errors::Result<()> {
     }
 
     Ok(())
+}
+
+// actions for create new deployment config.
+pub fn dep_new(contract: &str) -> errors::Result<()> {
+    let config_path = "ebox.json";
+    let config_exist = utils::file_exist(config_path);
+    let artifacts_dir = "artifacts";
+    let artifacts_dir_exist = utils::dir_exist(artifacts_dir);
+    let artifacts = format!("{}/{}.abi", artifacts_dir, contract);
+    let artifacts_exist = utils::file_exist(&artifacts);
+
+    if !config_exist {
+        return Err("ebox.json not found, consider init this project first".into());
+    }
+
+    if !artifacts_dir_exist {
+        return Err(
+            "artifacts directory not found, compile the project first using `ebox box` command"
+                .into(),
+        );
+    }
+
+    if !artifacts_exist {
+        return Err(format!("Cannot find {}", artifacts).into());
+    }
+
+    let abi = utils::file_read(&artifacts)?;
+    let dep = d_generate(contract, &abi)?;
+
+    if !dir_exist("deployments") {
+        let _ = utils::dir_new("deployments")?;
+    }
+
+    utils::file_new(format!("deployments/{}.json", contract).as_str(), &dep)
 }

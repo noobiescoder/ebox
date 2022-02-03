@@ -15,7 +15,9 @@
 
 #[cfg(test)]
 mod test_templates {
-    use ebox::templates::{config_decode, config_new, solidity_new, Compiler, Config, Project};
+    use ebox::templates::{
+        self, config_decode, config_new, solidity_new, Compiler, Config, Input, Project,
+    };
 
     #[test]
     fn test_config_new() {
@@ -63,5 +65,39 @@ mod test_templates {
         // case 1
         let sol = solidity_new("Test", "MIT");
         assert_eq!(sol.contains("contract Test"), true);
+    }
+
+    #[test]
+    fn d_generate() {
+        let abi = r#"[{"inputs":[{"internalType":"uint256","name":"cit","type":"uint256"}],"stateMutability":"nonpayable","type":"constructor"}]"#;
+        let dep_to_be = r#"{
+  "contract": "Token",
+  "constructor": {
+    "cit": {
+      "type": "uint256",
+      "value": ""
+    }
+  }
+}"#;
+        let dep = templates::d_generate("Token", abi).unwrap();
+        assert_eq!(dep, dep_to_be);
+    }
+
+    #[test]
+    fn d_decode() {
+        let dep = r#"{
+  "contract": "Token",
+  "constructor": {
+    "cit": {
+      "type": "uint256",
+      "value": ""
+    }
+  }
+}"#;
+
+        let dep_d = templates::d_decode(dep).unwrap();
+        let cit: &Input = dep_d.constructor.get("cit").unwrap();
+        assert_eq!(dep_d.contract, "Token");
+        assert_eq!(cit.r#type, "uint256");
     }
 }
