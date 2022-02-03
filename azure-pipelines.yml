@@ -1,0 +1,11 @@
+trigger:
+  - main
+
+pool:
+  vmImage: "ubuntu-latest"
+
+jobs:
+  - job: Prepare
+    steps:
+      - script: |
+          apt update -y && apt upgrade -y

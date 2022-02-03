@@ -1,6 +1,10 @@
 language: rust
 sudo: true
 
+branches:
+  only:
+    - master
+
 addons:
   apt:
     packages:
